@@ -1,8 +1,8 @@
 session: {
   _comment_: exp1,
-  project_name: camvid_segmentatation,
-  save_path: ./logs,
   neptune_project: demo-segmentbox,
+  save_path: ./logs,
+  project_name: camvid_segmentatation,
 }
 
 data : {
