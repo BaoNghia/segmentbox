@@ -1,8 +1,6 @@
 import os, time
 import logging
 import argparse
-import numpy as np
-from tqdm import tqdm
 from datetime import datetime
 
 import torch
@@ -11,9 +9,9 @@ from utils import general, metrics_loader, callbacks
 from utils.general import (yaml_loader, model_loader,  get_optimizer,
     get_lr_scheduler, get_loss_fn)
 
-import segmentation_models_pytorch as smp
 import trainer
-import test as tester
+import segmentation_models_pytorch as smp
+
 
 # from torchsampler import ImbalancedDatasetSampler
 def main(config, model, log_dir, checkpoint=None,):     
@@ -153,7 +151,7 @@ if __name__ == "__main__":
 
     ## create logger
     tb_writer = general.make_writer(log_dir = log_dir)
-    logger = general.log_initilize(os.path.join(log_dir, "model_logs.txt"))
+    logger = general.log_initilize(log_dir)
     logger.info(f"Start Tensorboard with tensorboard --logdir {log_dir}, view at http://localhost:6006/")
     logger.info(f"Project name: {project_name}")
     logger.info(f"CONFIGS: \n {config}")
