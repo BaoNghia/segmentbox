@@ -1,0 +1,17 @@
+numpy
+pandas
+barbar
+torch
+torchvision
+torchsummary
+scikit-learn
+matplotlib
+opencv-python
+neptune-client
+pretrainedmodels
+efficientnet_pytorch
+segmentation_models_pytorch
+tensorboard
+Pillow==8.2.0
+albumentations
+pywick
