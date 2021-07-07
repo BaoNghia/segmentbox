@@ -42,7 +42,7 @@ scheduler: {
   factor: 0.1,
 }
 
-# Support TorchMetrics or custom metric(later)
+# Support sklearn metrics or custom metrics
 train: {
   num_epochs: 20,
   loss: BCEDiceLoss,
