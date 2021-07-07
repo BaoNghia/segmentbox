@@ -82,7 +82,9 @@ def yaml_loader(yaml_file):
         config = yaml.load(f, Loader=loader) # cfg dict
     return config
 
-def log_initilize(log_file):
+
+def log_initilize(log_dir):
+    log_file = os.path.join(log_dir, "model_logs.txt")
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     # create error file handler and set level to error
@@ -93,6 +95,7 @@ def log_initilize(log_file):
     handler.terminator = "\n"
     logger.addHandler(handler)
     return logger
+
 
 def make_writer(log_dir):
     writer = SummaryWriter(log_dir=log_dir)
