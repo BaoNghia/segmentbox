@@ -10,7 +10,7 @@ data : {
   data_csv_name: ./dataset/camvid_data/train.csv,
   validation_ratio: 0,
   validation_csv_name : ./dataset/camvid_data/val.csv,
-  test_csv_name: ./dataset/camvid_data/val.csv,
+  test_csv_name: ./dataset/camvid_data/test.csv,
   # fold_list: ["fold0", "fold1", "fold2", "fold3", "fold4"],
   label_dict: ["car", "sky"],
   batch_size: 4,

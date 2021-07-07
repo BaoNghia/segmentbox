@@ -1,7 +1,7 @@
-# Torchbox - a fully customizable deep learning implementation solution in Pytorch
+# Segmentbox - a fully customizable deep learning implementation solution in Pytorch
 implement and fine-tune your deep learning model in an easy, customizable and fastest way
 
-First version created in Oct 2019 by @lexuanhieu131297
+First version created in Oct 2019 by @lexuanhieu
 
 # Introduction
 
@@ -34,7 +34,7 @@ Introduce the usage of a config file that contains neccessary params for trainin
 
 ### Simple training and testing 
 
-Only ``` $ python run_exp.py```  is required to do so
+Only ``` $ python train.py```  is required to do so
 
 ### Specilized for transfer learning
 
@@ -59,7 +59,7 @@ I have already implemented a built-in classification example. To use it:
 
 3. Editting config file as needed (See documentation)
 
-4. Run : ```$ python run_exp.py```
+4. Run : ```$ python train.py```
 
 
 # Documentation
@@ -71,60 +71,65 @@ The config file is the core file in this package. It contains core parameters to
 
 ### **sess_name**
 ```json
-{
-  "session": {
-    "sess_name" : "trial_1"
-  },
-}
+"session": {
+  "project_name": "experiment_1",
+  "save_path": "logs/"
+},
 ```
-This will create a directory that have name is "sess_name" + time
+This will create a directory that have name is ["save_path" / "project_name" + time]
 
 ### **data params**
 ```json
-{
-  "data":{
-    "data_csv_name": "dataset/train.csv",
-    "validation_ratio": "0.2",
-    "test_csv_name": "dataset/test.csv",
-    "data_path": "dataset/ex_data/",
-    "label_dict": ["cat","dog"]
-  }
+"data":{
+  "data.class": "data_loader.Segmentation.CamvidDataset",
+  "data_csv_name": "./dataset/camvid_data/train.csv",
+  "validation_ratio": 0,
+  "validation_csv_name" : "./dataset/camvid_data/val.csv",
+  "test_csv_name": "./dataset/camvid_data/test.csv",
+  "label_dict": ["car", "sky"],
+  "batch_size": 4,
 }
 ```
 In order to train, we requires two csv files for the training and testing set, each has **two columns named "file_name" and "label (int starting from 0)"**
 
 Kindly provide the two csv file path in "data_csv_name" (for training set) and "test_csv_name" (for testing set)
 
-All of your images should be inside the folder indicated by the param **data_path**
-
 The training set will be further splitted to a smaller validation set by the **validation_ratio**
 
-label_dict: a list of all label names for mapping
+*label_dict:* a list of all label names for mapping
 
 ### **Optimizer**
 ```json
-{
-  "optimizer": {
-    "name": "Adam",
-    "lr": 1e-4,
-    "lr_scheduler_factor": "min",
-    "lr_patience" : 10,
-    "reduce_lr_factor" : 0.5
-  }
+"optimizer": {
+  "name": "Adam",
+  "lr": 1e-3,
 }
 ```
-*name* : name of the optimizer class in torch.optim. *Ex*: if you intend to use torch.optim.Adam simply type "Adam". 
+*name:* name of the optimizer class in **torch.optim**. *Ex*: If you intend to use **torch.optim.Adam** simply type "Adam". 
 
-*lr_scheduler_factor*, *lr_patience*, *reduce_lr_factor*: Args for decay learning rate 
+*lr:* Args for optimizer
+
+### **Learning rate Scheduler**
+```json
+"scheduler": {
+  "name": "ReduceLROnPlateau",
+  "min_lr": 1e-5,
+  "mode": "min",
+  "patience": 3,
+  "factor": 0.1,
+}
+```
+*name* : name of the optimizer class in **torch.optim.lr_scheduler**. *Ex*: if you intend to use **torch.optim.lr_scheduler.ReduceLROnPlateau** simply type "ReduceLROnPlateau". 
+
+other args: Args for decay learning rate 
 
 ## **Model**
 ```json
-{
-  "model":{
-    "model.class": "models.resnet_transfer.resnet.ResNet_transfer",
-    "model_name": "resnet50",
-    "num_class": 2
-  }
+"model":{
+  "model.class": "models.segmentation.fpn.FPN_Segmentation",
+  "model_name": "se_resnext50_32x4d",
+  "num_class": 2,
+  "pretrained": true,
 }
 ```
 *model.class:* module ResNet_transfer is defined in models/resnet_transfer/resnet.py
@@ -138,15 +143,12 @@ label_dict: a list of all label names for mapping
 
 ### **Other setting to train**
 ```json
-{
-  "train":{
-    "num_epoch": 30,
-    "loss": "CrossEntropyLoss",
-    "early_patience": 10,
-    "mode":"min",
-    "save_path": "../checkpoints",
-    "metrics": ["accuracy_score"]
-  }
+"train": {
+  "num_epoch": 20,
+  "loss": "BCEDiceLoss",
+  "metrics": ["iou", "dice"],
+  "early_patience": 5,
+  "mode": "min",
 }
 ```
 *num_epoch:* number of epoch.
@@ -154,8 +156,6 @@ label_dict: a list of all label names for mapping
 *loss:* if you intend to use torch.nn.CrossEntropyLoss simply type CrossEntropyLoss.
 
 *early_patience*, *mode:* Args for Early Stopping
-
-*save_path:* path to save checkpoints, logs
 
 
 ## **Customizing your metrics: use your own metrics**
@@ -166,7 +166,7 @@ Let's say you want to use your custom and newly created metrics. All you need to
 
 Example: MyMetrics.IoU(labels,preds) 
 
-Then in the utils/metrics.py file:
+Then in the utils/metrics_loader.py file:
 
 1. import your class
 
@@ -189,11 +189,11 @@ See data_loader/transform.py for customizing the transformation
 
 ## **Customizing training actions:**
 
-See trainer.py, the file containing scripts for training one entire epoch
+See in train.py,
 ```
   if epoch == 5:
     for param in model.parameters():
         param.requires_grad = True
 ```
-In first few epoch, model is freezed the **feature_extractor** to train **classify layer** and then they will be unfreezed train entire model.
+In the first few epochs, model is freezed the **feature_extractor** to train **classify layer** and then they will be unfreezed train entire model.
 
